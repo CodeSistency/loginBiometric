@@ -9,6 +9,7 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -58,8 +59,8 @@ class MainActivity : FragmentActivity() {
         setContent {
             LoginBiometricTheme {
                 // A surface container using the 'background' color from the theme
-            /*Router()*/
-                PreviewLogin()
+            Router()
+
             }
         }
     }
@@ -145,10 +146,7 @@ fun PreviewHome() {
 @Composable
 fun Home(navController: NavHostController) {
 
-    var name by remember {
-        mutableStateOf("")
-    }
-//
+
     val context = LocalContext.current
     val activity = LocalContext.current as FragmentActivity
     val executor = ContextCompat.getMainExecutor(activity)
@@ -173,7 +171,7 @@ fun Home(navController: NavHostController) {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 Toast.makeText(context, "succeeded!", Toast.LENGTH_LONG).show()
-                navController.navigate("live")
+                navController.navigate("logged")
             }
 
             override fun onAuthenticationFailed() {
@@ -186,41 +184,72 @@ fun Home(navController: NavHostController) {
     )
 
 
+
+
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.LightGray)
+            .padding(16.dp)
     ) {
-        Text(text = "Bienvenido")
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "Ingrese su nombre")
-        TextField(value = name, onValueChange = {
-            name = it
-        })
-        Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {
-            if (name.isNullOrBlank()){
-                Toast.makeText(context, "Ingrese un nombre", Toast.LENGTH_SHORT)
-            }else{
+        // First Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(Color.Blue, Color.Green)
+                    ),
+                    shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                )
+        ) {
+            Text(
+                text = "Welcome",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
 
-                navController.navigate("live")
+        // Second Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(color = Color.Gray.copy(alpha = 0.1f))
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(
+                onClick = { biometricPrompt.authenticate(promptInfo) },
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+//                    .shadow(4.dp, CircleShape)
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_fingerprint),
+                    contentDescription = "Fingerprint Icon",
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .size(120.dp)
+
+                )
             }
-        }) {
-            Text(text = "Continuar")
         }
-
-
-
-        Button(onClick = {
-
-            biometricPrompt.authenticate(promptInfo)
-        }) {
-            Text(text = "Autenticación Biometrica")
-        }
-
-
     }
+
 }
 
 @Composable
 fun LoggedIn() {
-
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(text = "Logged In")
+    }
 }
